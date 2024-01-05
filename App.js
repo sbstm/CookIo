@@ -33,16 +33,6 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="AddRecipe"
         component={AddRecipeScreen}
         options={{
@@ -53,12 +43,12 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="login"
-        component={LoginScreen}
+        name="Profile"
+        component={ProfileScreen}
         options={{
-          tabBarLabel: 'login',
+          tabBarLabel: 'Profile',
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="account" color={color} size={26} />
+            <MaterialCommunityIcons name="home" color={color} size={26} />
           ),
         }}
       />
@@ -99,18 +89,33 @@ function NotLoginTabs() {
 export default function App() {
   const [userLoggedIn, setUserLoggedIn] = useState(false) // Consider your authentication state management here
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserLoggedIn(true)
+      } else {
+        setUserLoggedIn(false)
+      }
+    })
+    return unsubscribe
+  }, [])
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {userLoggedIn ? (
-          <View>
+          <>
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="Recipe" component={RecipeScreen} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
-          </View>
+          </>
         ) : (
-          <Stack.Screen name="Main1" component={NotLoginTabs} />
+          <>
+            <Stack.Screen name="Main1" component={NotLoginTabs} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen name="Recipe" component={RecipeScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
