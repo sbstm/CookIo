@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ref, set } from 'firebase/database'
 import {
   View,
@@ -12,6 +12,7 @@ import { auth } from '../firebase'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  reload,
 } from 'firebase/auth'
 import Singup from './Signup'
 import { useNavigation } from '@react-navigation/native'
@@ -22,6 +23,7 @@ function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const navigation = useNavigation()
+  const user = auth.currentUser
 
   const handleSignupPress = () => {
     navigation.navigate('Signup') // Ensure 'Signup' matches the screen name in your navigator
@@ -43,8 +45,23 @@ function Login() {
       })
   }
 
+  const handleLogout = async () => {
+    await auth.signOut()
+    navigation.navigate('login')
+  }
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible)
+  }
+  if (user != null) {
+    return (
+      <View>
+        <Text>Sudah login</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text>loqout</Text>
+        </TouchableOpacity>
+      </View>
+    )
   }
 
   return (

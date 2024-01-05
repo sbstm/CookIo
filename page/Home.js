@@ -35,7 +35,7 @@ function Home() {
   }, [])
 
   const handleItem = (item) => {
-    navigation.navigate('Recipe', { selectedRecipe: item }) // Pass the selected recipe as a parameter
+    navigation.navigate('Recipe', { item }) // Pass the selected recipe as a parameter
   }
 
   const handleSearch = () => {
@@ -57,6 +57,49 @@ function Home() {
         setMenuData(filteredData)
       }
     })
+  }
+  if (menuData.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ScrollView>
+          <View style={styles.top}>
+            <ImageBackground
+              source={require('../assets/images/ayam.png')}
+              style={styles.bgtop}
+            >
+              <Text style={styles.header}>
+                YUK CARI RESEP
+                <br />
+                MASAKAN KAMU HARI INI!
+              </Text>
+              <View style={styles.searchBar}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Ketik disini"
+                  value={searchText}
+                  onChangeText={(text) => setSearchText(text)}
+                />
+                <TouchableOpacity
+                  style={styles.searchButton}
+                  onPress={handleSearch}
+                >
+                  <Text style={styles.searchButtonText}>Cari</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.separator} />
+            </ImageBackground>
+          </View>
+          <View style={styles.recipeItem}>
+            <ImageBackground
+              source={require('../assets/images/ayam.png')}
+              style={styles.recipeBackground}
+            >
+              <Text style={styles.recipeTitle}>Tidak ada resep</Text>
+            </ImageBackground>
+          </View>
+        </ScrollView>
+      </View>
+    )
   }
 
   return (

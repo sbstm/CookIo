@@ -14,9 +14,12 @@ import {
   createUserWithEmailAndPassword,
 } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/native'
+import { db } from '../firebase'
+import { storage } from '../firebase'; 
 
 function Singup() {
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordAgain, setPasswordAgain] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
@@ -27,25 +30,42 @@ function Singup() {
 
   const handleSignup = async () => {
     setLoading(true)
-    if (password !== passwordAgain) {
-      alert('Password tidak sama')
-      setLoading(false)
-      return
-    } else {
-      await createUserWithEmailAndPassword(auth, username, password)
-        .then((userCredential) => {
-          // Berhasil membuat akun baru
-          const user = userCredential.user
-          console.log('User berhasil dibuat:', user)
-          setLoading(false)
-          // Mungkin ada langkah tambahan setelah pendaftaran berhasil, seperti navigasi ke halaman selanjutnya, dll.
-        })
-        .catch((error) => {
-          const errorMessage = error.message
-          console.log('Error:', errorMessage)
-          setLoading(false)
-          // Handle error, misalnya menampilkan pesan kesalahan ke pengguna
-        })
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+      const newUser = userCredential.user
+
+      // Simpan informasi pengguna ke dalam database setelah sign-up berhasil
+      if (newUser) {
+        const userId = newUser.uid
+        const userData = {
+          email: newUser.email,
+          username: username,
+          post: 0,
+          followers: 0,
+          following: 0,
+        }
+        // Referensi ke Firebase Realtime Database
+        const userRef = ref(db, `users/${userId}`)
+
+        // Simpan data pengguna ke dalam node 'users' dengan UID sebagai key
+        set(userRef, userData)
+          .then(() => {
+            console.log('User data saved to database')
+            navigation.navigate('login')
+            // Redirect user or perform additional actions after successful sign-up
+          })
+          .catch((error) => {
+            console.error('Error saving user data to database:', error)
+          })
+      }
+    } catch (error) {
+      const errorMessage = error.message
+      console.error('Sign-up error:', errorMessage)
+      // Handle sign-up error, display error message, etc.
     }
   }
 
@@ -61,12 +81,19 @@ function Singup() {
         <Text style={styles.header}>
           Ayo sign in sekarang dan memulai memasak!!!
         </Text>
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>Username</Text>
         <TextInput
           style={styles.input}
           placeholder="masukan email"
           value={username}
           onChangeText={(text) => setUsername(text)}
+        />
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="masukan email"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
         />
         <Text style={styles.label}>Password</Text>
         <TextInput

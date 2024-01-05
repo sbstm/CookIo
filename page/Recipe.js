@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -6,13 +6,38 @@ import {
   TouchableOpacity,
   StyleSheet,
   ImageBackground,
+  FlatList,
   ScrollView,
   Image,
 } from 'react-native'
-import { FlatList } from 'react-native-gesture-handler'
+import { ref, orderByChild, equalTo, onValue } from 'firebase/database'
+import { db } from '../firebase'
 
 function Recipe({ route }) {
-  const { Recipes } = route.params
+  const selectedRecipe = route.params // Convert to string
+
+  console.log(selectedRecipe)
+
+  const judul = selectedRecipe.item.judul
+  console.log(judul)
+
+  const descripsi = selectedRecipe.item.descripsi
+  console.log(descripsi)
+
+  const time = selectedRecipe.item.time
+  console.log(time)
+  const porsi = selectedRecipe.item.porsi
+  console.log(porsi)
+  const ingredient = selectedRecipe.item.ingredient
+  console.log(ingredient)
+  const alat = selectedRecipe.item.alat
+  console.log(alat)
+  const step = selectedRecipe.item.step
+  console.log(step)
+  const image = selectedRecipe.item.imageLink
+
+  console.log(image)
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -22,18 +47,14 @@ function Recipe({ route }) {
         >
           <View style={styles.head}>
             <Text style={styles.masakan}>
-              {recipes.judul.length > 20
-                ? recipes.judul.substring(0, 20) + '...'
-                : recipes.judul}
+              {judul.length > 20 ? judul.substring(0, 20) + '...' : judul}
             </Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button}>
-                <Link href="/login" asChild>
-                  <ImageBackground
-                    source={require('../assets/images/masak.png')}
-                    style={styles.masak}
-                  ></ImageBackground>
-                </Link>
+                <ImageBackground
+                  source={require('../assets/images/masak.png')}
+                  style={styles.masak}
+                ></ImageBackground>
               </TouchableOpacity>
               <TouchableOpacity style={styles.button}>
                 <ImageBackground
@@ -44,82 +65,66 @@ function Recipe({ route }) {
             </View>
           </View>
           <Text style={styles.ingredientText}>
-            {recipes.jenis.join(', ')} x {recipes.time} x {recipes.porsi}
+            {descripsi} x {time} menit x {porsi} orang
           </Text>
         </ImageBackground>
       </View>
       <View style={styles.isi}>
         <Text style={styles.subhead}>Bahan</Text>
-        <Text style={styles.subsubhead}>
-          {' '}
-          {recipes.bahan.length} Bahan baku
-        </Text>
-        <FlatList
-          data={recipes.bahan.map((item, index) => ({
-            bahan: item,
-            ukuran: recipes.ukuranbahan[index],
-            key: index.toString(),
-          }))}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingHorizontal: 10,
-                paddingVertical: 3,
-              }}
-            >
-              <Text style={{ fontSize: 16 }}>{item.bahan}</Text>
-              <Text style={{ fontSize: 16, color: 'gray' }}>{item.ukuran}</Text>
-            </View>
-          )}
-        />
+        <Text style={styles.subsubhead}> {ingredient.length} Bahan baku</Text>
+        {ingredient.map((item, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingHorizontal: 10,
+              paddingVertical: 3,
+            }}
+          >
+            <Text>{ingredient[index].ingredient}</Text>
+            <Text>
+              {ingredient[index].takaran} {ingredient[index].unit}
+            </Text>
+          </View>
+        ))}
+
         <Text style={styles.subhead}>Alat</Text>
         <Text style={styles.subsubhead}>
           {' '}
-          {recipes.alat.length} Alat yang diperlukan
+          {alat.length} Alat yang diperlukan
         </Text>
-        <FlatList
-          data={recipes.alat}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 10,
-                paddingVertical: 3,
-              }}
-            >
-              <Text style={{ fontSize: 16 }}>{item}</Text>
-            </View>
-          )}
-        />
-
+        {alat.map((item, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingHorizontal: 10,
+              paddingVertical: 3,
+            }}
+          >
+            <Text>{alat[index].name}</Text>
+          </View>
+        ))}
         <Text style={styles.subhead}>Langkah - langkah</Text>
-
-        <Text style={styles.subsubhead}>
-          {' '}
-          {recipes.steps.length} tahap pembuatan
-        </Text>
-        <FlatList
-          data={recipes.steps}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 10,
-                paddingVertical: 3,
-              }}
-            >
-              <Text style={{ fontSize: 16 }}>{item}</Text>
-            </View>
-          )}
-        />
+        <Text style={styles.subsubhead}> {step.length} tahap pembuatan</Text>
+        {step.map((item, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingHorizontal: 10,
+              paddingVertical: 3,
+            }}
+          >
+            <Text>{step[index].step}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   )

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -12,21 +12,34 @@ import {
 import { Picker } from '@react-native-picker/picker'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import * as ImagePicker from 'expo-image-picker'
-import { db, storage } from '../firebase'
+import { db, storage, auth } from '../firebase'
 import {
   ref as raf1,
   uploadBytesResumable,
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage'
-import { set, ref, onValue, push } from 'firebase/database'
+import { set, ref, onValue, push, update } from 'firebase/database'
 
-function writeAddRecipe(judul, descripsi, ingredient, stepsRows, imageLink) {
+function writeAddRecipe(
+  judul,
+  descripsi,
+  ingredient,
+  stepsRows,
+  imageLink,
+  alat,
+  porsi,
+  time,
+  userid
+) {
   const menuRef = ref(db, 'Recipe')
-
   const newMenuRef = push(menuRef)
   set(newMenuRef, {
+    userupload: userid,
     judul: judul,
+    time: time,
+    porsi: porsi,
+    alat: alat,
     descripsi: descripsi,
     ingredient: ingredient,
     step: stepsRows,
@@ -41,6 +54,7 @@ function writeAddRecipe(judul, descripsi, ingredient, stepsRows, imageLink) {
 }
 
 const AddRecipe = ({ navigation }) => {
+  const [resepid, setResepid] = useState('')
   const [recipeName, setRecipeName] = useState('')
   const [description, setDescription] = useState('')
   const [instructions, setInstructions] = useState('')
@@ -52,14 +66,22 @@ const AddRecipe = ({ navigation }) => {
     { ingredient: '', takaran: 0, unit: 'Grams' },
   ])
   const [stepsRows, setStepsRows] = useState([{ step: '' }])
+  const [userid, setUserid] = useState('')
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const currentUser = auth.currentUser
 
   const handleAddRecipe = () => {
     if (
-      !recipeName ||
-      !description ||
-      ingredientRows.some((item) => !item.ingredient) ||
-      stepsRows.some((item) => !item.step) ||
-      !imageLink
+      (!recipeName ||
+        !description ||
+        ingredientRows.some((item) => !item.ingredient) ||
+        stepsRows.some((item) => !item.step) ||
+        !imageLink,
+      !alat,
+      !porsi,
+      !time)
     ) {
       alert('Mohon lengkapi formulir!')
       return
@@ -69,12 +91,19 @@ const AddRecipe = ({ navigation }) => {
       description,
       ingredientRows,
       stepsRows,
-      imageLink
+      imageLink,
+      alat,
+      porsi,
+      time,
+      currentUser.uid
     )
     setRecipeName('')
     setDescription('')
     setInstructions('')
     setImageLink('')
+    setPorsi('')
+    setTime('')
+    setAlat([{ name: '' }])
     setIngredientRows([{ ingredient: '', takaran: 0, unit: 'Grams' }])
     setStepsRows([{ step: '' }])
   }
@@ -100,6 +129,14 @@ const AddRecipe = ({ navigation }) => {
     const updatedRows = [...stepsRows]
     updatedRows[index].step = value
     setStepsRows(updatedRows)
+  }
+  const handleAlatChange = (index, value) => {
+    const updatedRows = [...alat]
+    updatedRows[index].name = value
+    setAlat(updatedRows)
+  }
+  const handleAddAlatRow = () => {
+    setAlat((prevRows) => [...prevRows, { name: '' }])
   }
 
   const handleImagePicker = async () => {
@@ -183,7 +220,7 @@ const AddRecipe = ({ navigation }) => {
         <TextInput
           style={styles.input}
           value={item.name}
-          onChangeText={(text) => handleStepsChange(index, text)}
+          onChangeText={(text) => handleAlatChange(index, text)}
           placeholder={`${index + 1} .........`}
           multiline
         />
@@ -265,7 +302,7 @@ const AddRecipe = ({ navigation }) => {
               alignItems: 'center',
               marginTop: 10,
             }}
-            onPress={handleAddStepsRow}
+            onPress={handleAddAlatRow}
           >
             {/* Menggunakan ikon plus di dalam tombol */}
             <Icon name="plus" size={10} color="#000" />
