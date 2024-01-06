@@ -5,6 +5,7 @@ import {
   TextInput,
   Button,
   ScrollView,
+  ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
@@ -30,7 +31,8 @@ function writeAddRecipe(
   alat,
   porsi,
   time,
-  userid
+  userid,
+  resepid
 ) {
   const menuRef = ref(db, 'Recipe')
   const newMenuRef = push(menuRef)
@@ -44,6 +46,7 @@ function writeAddRecipe(
     ingredient: ingredient,
     step: stepsRows,
     imageLink: imageLink,
+    resepid: resepid,
   })
     .then(() => {
       console.log('Data menu berhasil disimpan ke Firebase Realtime Database')
@@ -54,7 +57,6 @@ function writeAddRecipe(
 }
 
 const AddRecipe = ({ navigation }) => {
-  const [resepid, setResepid] = useState('')
   const [recipeName, setRecipeName] = useState('')
   const [description, setDescription] = useState('')
   const [instructions, setInstructions] = useState('')
@@ -66,13 +68,27 @@ const AddRecipe = ({ navigation }) => {
     { ingredient: '', takaran: 0, unit: 'Grams' },
   ])
   const [stepsRows, setStepsRows] = useState([{ step: '' }])
-  const [userid, setUserid] = useState('')
-  const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const currentUser = auth.currentUser
 
+  const generateRecipeId = () => {
+    const timestamp = Date.now().toString(36) // Convert timestamp to base36 string
+    const randomString = Math.random().toString(36).substring(2, 7) // Generate random string
+    const recipeId = `${timestamp}-${randomString}`
+    return recipeId
+  }
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    )
+  }
+
   const handleAddRecipe = () => {
+    setLoading(true)
     if (
       (!recipeName ||
         !description ||
@@ -84,28 +100,34 @@ const AddRecipe = ({ navigation }) => {
       !time)
     ) {
       alert('Mohon lengkapi formulir!')
-      return
+      setLoading(false)
+    } else {
+      const uniqueRecipeId = generateRecipeId()
+      writeAddRecipe(
+        recipeName,
+        description,
+        ingredientRows,
+        stepsRows,
+        imageLink,
+        alat,
+        porsi,
+        time,
+        currentUser.uid,
+        uniqueRecipeId
+      )
+      alert('Resep berhasil ditambahkan!')
+      setLoading(false)
+      navigation.navigate('Profile')
+      setRecipeName('')
+      setDescription('')
+      setInstructions('')
+      setImageLink('')
+      setPorsi('')
+      setTime('')
+      setAlat([{ name: '' }])
+      setIngredientRows([{ ingredient: '', takaran: 0, unit: 'Grams' }])
+      setStepsRows([{ step: '' }])
     }
-    writeAddRecipe(
-      recipeName,
-      description,
-      ingredientRows,
-      stepsRows,
-      imageLink,
-      alat,
-      porsi,
-      time,
-      currentUser.uid
-    )
-    setRecipeName('')
-    setDescription('')
-    setInstructions('')
-    setImageLink('')
-    setPorsi('')
-    setTime('')
-    setAlat([{ name: '' }])
-    setIngredientRows([{ ingredient: '', takaran: 0, unit: 'Grams' }])
-    setStepsRows([{ step: '' }])
   }
 
   const handleAddIngredientRow = () => {
@@ -370,7 +392,23 @@ const AddRecipe = ({ navigation }) => {
             borderRadius: 10,
           }}
         >
-          <Button title="Selesai" onPress={handleAddRecipe} color="#FBD532" />
+          <TouchableOpacity
+            onPress={handleAddRecipe}
+            color="#FBD532"
+            style={{
+              borderWidth: 1,
+              paddingHorizontal: 10,
+              borderColor: '#CCC',
+              borderRadius: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#FBD532',
+              width: 100,
+              borderRadius: 20,
+            }}
+          >
+            <Text style={{ color: '#fff' }}>Kirim Resep</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
@@ -399,6 +437,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     fontWeight: 'bold',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#333',
   },
   input: {
     borderWidth: 1,

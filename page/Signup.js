@@ -15,7 +15,7 @@ import {
 } from 'firebase/auth'
 import { useNavigation } from '@react-navigation/native'
 import { db } from '../firebase'
-import { storage } from '../firebase'; 
+import { storage } from '../firebase'
 
 function Singup() {
   const [username, setUsername] = useState('')
@@ -44,9 +44,8 @@ function Singup() {
         const userData = {
           email: newUser.email,
           username: username,
-          post: 0,
-          followers: 0,
-          following: 0,
+          followers: [],
+          following: [],
         }
         // Referensi ke Firebase Realtime Database
         const userRef = ref(db, `users/${userId}`)
@@ -55,7 +54,7 @@ function Singup() {
         set(userRef, userData)
           .then(() => {
             console.log('User data saved to database')
-            navigation.navigate('login')
+            navigation.navigate('Main')
             // Redirect user or perform additional actions after successful sign-up
           })
           .catch((error) => {

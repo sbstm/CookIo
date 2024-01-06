@@ -8,8 +8,10 @@ import SignupScreen from './page/Signup'
 import AddRecipeScreen from './page/AddRecipe'
 import LoginScreen from './page/Login'
 import RecipeScreen from './page/Recipe'
-import ProfileScreen from './page/Profile'
+import ProfileScreen from './page/profile'
 import EditProfile from './page/EditProfile'
+import AddReview from './page/AddReview'
+import ReviewScreen from './page/Review'
 import { auth } from './firebase'
 
 const Tab = createMaterialBottomTabNavigator()
@@ -108,13 +110,14 @@ export default function App() {
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="Recipe" component={RecipeScreen} />
             <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="AddReview" component={AddReview} />
+            <Stack.Screen name="Review" component={ReviewScreen} />
           </>
         ) : (
           <>
             <Stack.Screen name="Main1" component={NotLoginTabs} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="Recipe" component={RecipeScreen} />
-            <Stack.Screen name="EditProfile" component={EditProfile} />
           </>
         )}
       </Stack.Navigator>

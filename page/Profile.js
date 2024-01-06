@@ -25,13 +25,13 @@ function Profile() {
   const [userData, setUserData] = useState({
     username: '',
     image: '',
-    posts: 0,
-    followers: 0,
-    following: 0,
+    followers: [],
+    following: [],
     bio: '',
   })
   const [loadingUserData, setLoadingUserData] = useState(true)
   const [data, setData] = useState([])
+  const [post, setPost] = useState(0)
   const [loadingImages, setLoadingImages] = useState(true)
 
   const currentUser = auth.currentUser
@@ -61,6 +61,8 @@ function Profile() {
         setLoadingImages(false)
       })
 
+      console.log(data.length)
+      setPost(data.length)
       const menuRef = ref(db, 'users/' + userId)
       onValue(menuRef, (snapshot) => {
         const userData = snapshot.val()
@@ -71,6 +73,12 @@ function Profile() {
       })
     }
   }, [currentUser])
+
+  useEffect(() => {
+    console.log(data.length)
+    setPost(data.length)
+  }, [data])
+
   useEffect(() => {
     const currentUser = auth.currentUser
     if (currentUser) {
@@ -90,6 +98,11 @@ function Profile() {
     navigation.navigate('Recipe', { item }) // Pass the selected recipe as a parameter
   }
 
+  const handleLogout = () => {
+    auth.signOut()
+    navigation.navigate('login')
+  }
+
   const handleEditProfile = () => {
     navigation.navigate('EditProfile')
   }
@@ -105,14 +118,36 @@ function Profile() {
           />
         </View>
         <View style={styles.headerColumn2}>
-          <Text style={styles.nameText}>{userData.username}</Text>
+          <View
+            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+          >
+            <Text style={styles.nameText}>{userData.username}</Text>
+            <TouchableOpacity onPress={() => handleFollow()}>
+              <Text style={styles.loqoutButton}> follow</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.statsText}>
-            {`${userData.posts} posts ${userData.followers} followers ${userData.following} following`}
+            {`${post} posts ${userData.followers} followers ${userData.following} following`}
           </Text>
           <Text style={styles.additionalText}>{userData.bio}</Text>
-          <TouchableOpacity onPress={handleEditProfile}>
-            <Text style={styles.editButton}>Edit Profile</Text>
-          </TouchableOpacity>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 16,
+            }}
+          >
+            <TouchableOpacity onPress={handleEditProfile}>
+              <Text style={styles.loqoutButton}>Edit Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                handleLogout()
+              }}
+            >
+              <Text style={styles.loqoutButton}>Logout </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     )
@@ -152,6 +187,12 @@ const styles = StyleSheet.create({
   headerColumn1: {
     flex: 1,
     alignItems: 'center',
+  },
+  loqoutButton: {
+    marginTop: 8,
+    color: '#777',
+    fontWeight: 'bold',
+    borderBlockColor: '#777',
   },
   headerColumn2: {
     flex: 2,

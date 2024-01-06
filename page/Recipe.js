@@ -9,37 +9,49 @@ import {
   FlatList,
   ScrollView,
   Image,
+  BackHandler,
 } from 'react-native'
 import { ref, orderByChild, equalTo, onValue } from 'firebase/database'
 import { db } from '../firebase'
+import { useNavigation } from '@react-navigation/native'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 function Recipe({ route }) {
+  const navigation = useNavigation()
   const selectedRecipe = route.params // Convert to string
-
   console.log(selectedRecipe)
-
   const judul = selectedRecipe.item.judul
-  console.log(judul)
-
   const descripsi = selectedRecipe.item.descripsi
-  console.log(descripsi)
-
   const time = selectedRecipe.item.time
-  console.log(time)
   const porsi = selectedRecipe.item.porsi
-  console.log(porsi)
   const ingredient = selectedRecipe.item.ingredient
-  console.log(ingredient)
   const alat = selectedRecipe.item.alat
-  console.log(alat)
   const step = selectedRecipe.item.step
-  console.log(step)
   const image = selectedRecipe.item.imageLink
 
-  console.log(image)
+  const handleback = () => {
+    navigation.goBack()
+    return true
+  }
 
+  const handleReview = () => {
+    navigation.navigate('Review', { selectedRecipe })
+  }
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 1,
+          borderRadius: 50,
+        }}
+        onPress={() => handleback()}
+      >
+        <Icon name="arrow-left" size={20} color="black" />
+      </TouchableOpacity>
+
       <View style={styles.content}>
         <ImageBackground
           source={require('../assets/images/ayam.png')}
@@ -56,9 +68,13 @@ function Recipe({ route }) {
                   style={styles.masak}
                 ></ImageBackground>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => handleReview()}
+              >
                 <ImageBackground
                   source={require('../assets/images/review.png')}
+                  onPress={() => handleReview()}
                   style={styles.masak}
                 ></ImageBackground>
               </TouchableOpacity>
@@ -71,7 +87,10 @@ function Recipe({ route }) {
       </View>
       <View style={styles.isi}>
         <Text style={styles.subhead}>Bahan</Text>
-        <Text style={styles.subsubhead}> {ingredient.length} Bahan baku</Text>
+        <Text style={styles.subsubhead}>
+          {' '}
+          {ingredient.length} Bahan baku assdas
+        </Text>
         {ingredient.map((item, index) => (
           <View
             key={index}
@@ -84,9 +103,13 @@ function Recipe({ route }) {
             }}
           >
             <Text>{ingredient[index].ingredient}</Text>
-            <Text>
-              {ingredient[index].takaran} {ingredient[index].unit}
-            </Text>
+            {ingredient[index].unit === 'Secukupnya' ? (
+              <Text> {ingredient[index].unit} </Text>
+            ) : (
+              <Text>
+                {ingredient[index].takaran} {ingredient[index].unit}{' '}
+              </Text>
+            )}
           </View>
         ))}
 
@@ -164,6 +187,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Segoe UI',
     alignContent: 'flex-start',
     width: 200,
+  },
+  radioButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  radioButtonSelected: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'blue',
+    marginLeft: 10,
   },
   buttonContainer: {
     flexDirection: 'row',

@@ -132,6 +132,7 @@ function Home() {
             <View style={styles.separator} />
           </ImageBackground>
         </View>
+        <View style={{ flexDirection: 'row', rowGap: 10, flexWrap: 'wrap' }} />
         {menuData.map((item, index) => (
           <TouchableOpacity
             key={index}
@@ -154,8 +155,25 @@ function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: 300,
     justifyContent: 'center',
+    width: '100%',
+    alignItems: 'center',
+  },
+
+  top: {
+    width: '100%',
+    height: 300,
+    borderBottomEndRadius: 25,
+    borderBottomStartRadius: 25,
+  },
+  bgtop: {
+    flex: 1,
+    width: '100%',
+    height: 300,
+    resizeMode: 'cover',
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   separator: {
     height: 50,
