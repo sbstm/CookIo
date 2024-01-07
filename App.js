@@ -11,7 +11,7 @@ import RecipeScreen from './page/Recipe'
 import ProfileScreen from './page/profile'
 import EditProfile from './page/EditProfile'
 import AddReview from './page/AddReview'
-import ReviewScreen from './page/Review'
+import ReviewScreen from './page/RecipeReview'
 import { auth } from './firebase'
 
 const Tab = createMaterialBottomTabNavigator()

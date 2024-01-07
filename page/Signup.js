@@ -76,6 +76,18 @@ function Singup() {
   }
   return (
     <View style={styles.container}>
+    <TouchableOpacity
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 1,
+          borderRadius: 50,
+        }}
+        onPress={() => handleback()}
+      >
+        <Icon name="arrow-left" size={20} color="black" />
+      </TouchableOpacity>
       <View style={styles.content}>
         <Text style={styles.header}>
           Ayo sign in sekarang dan memulai memasak!!!

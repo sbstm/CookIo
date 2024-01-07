@@ -27,21 +27,22 @@ import { useNavigation } from '@react-navigation/native'
 
 const AddReview = ({ route }) => {
   const selectedRecipe = route.params
+  console.log(selectedRecipe)
 
   const [description, setDescription] = useState('')
   const [imageLink, setImageLink] = useState('')
   const [rating, setRating] = useState(0)
   const [loading, setLoading] = useState(false)
   const navigation = useNavigation()
+  const idrecipe = selectedRecipe.resepid
+  console.log(idrecipe)
 
   const handleAddReview = async () => {
     const currentUser = auth.currentUser
     const userId = currentUser.uid
-    const idrecipe = selectedRecipe.selectedRecipe.item.resepid
-
     try {
       const reviewRef = ref(db, 'Review/') // Generate unique key
-      const newReviewKey = push(reviewRef).key
+      const newReviewKey = push(reviewRef)
       const newReview = {
         description: description,
         imageLink: imageLink,
@@ -49,14 +50,27 @@ const AddReview = ({ route }) => {
         userupload: userId,
         recipeid: idrecipe,
       }
-
-      await set(reviewRef, newReview)
+      await set(newReviewKey, newReview)
       console.log('Review berhasil ditambahkan!')
       navigation.navigate('Home')
     } catch (error) {
       console.error('Error adding review:', error)
     }
   }
+   const renderRatingIcons = (rating) => {
+    const icons = [];
+    for (let i = 1; i <= 5; i++) {
+      icons.push(
+        <Icon
+          key={i}
+          name={i <= rating ? 'star' : 'star-o'}
+          size={20}
+          color={i <= rating ? '#FBD532' : '#DDD'}
+        />
+      );
+    }
+    return icons;
+  };
 
   const handleImagePicker = async () => {
     try {
@@ -99,6 +113,16 @@ const AddReview = ({ route }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 1,
+          borderRadius: 50,
+        }}
+        onPress={() => handleback()}
+      ></TouchableOpacity>
       <Text style={styles.heading}>Bagaimana Hasil Masakanmu?</Text>
 
       <View style={{ flexDirection: 'row', marginBottom: 10 }}>
@@ -155,11 +179,9 @@ const AddReview = ({ route }) => {
             borderRadius: 50,
           }}
         >
-          <Button
-            title="Kirim Review"
-            onPress={() => handleAddReview()}
-            color="#FBD532"
-          />
+          <TouchableOpacity onPress={() => handleAddReview()} color="#FBD532">
+            <Text style={{ color: '#FBD532', fontSize: 16 }}>Kirim</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ScrollView>

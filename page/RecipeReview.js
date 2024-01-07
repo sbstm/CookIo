@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import * as React from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import {
   View,
@@ -23,14 +24,19 @@ import {
   update,
 } from 'firebase/database'
 import { db, auth, storage } from '../firebase'
-const RecipeReview = ({ route }) => {
+import { ref as raf1, uploadBytesResumable } from 'firebase/storage'
+import { useNavigation } from '@react-navigation/native'
+
+const Review = ({ route }) => {
   const selectedRecipe = route.params // Convert to string
   const [data, setData] = useState([])
   const [dataUser, setDataUser] = useState([])
   const currentUser = auth.currentUser
   const [like, setLike] = useState(false)
+  const navigation = useNavigation()
 
-  const resepid = selectedRecipe.selectedRecipe.item.resepid
+  const resepid = selectedRecipe.selectedRecipe.item.resepid.toString()
+  console.log(resepid)
 
   const namaresep = selectedRecipe.selectedRecipe.item.judul
   const gambar = selectedRecipe.selectedRecipe.item.imageLink
@@ -40,28 +46,60 @@ const RecipeReview = ({ route }) => {
     setLike(!like)
   }
 
+  const handleback = () => {
+    navigation.goBack()
+    return true
+  }
   useEffect(() => {
-    const recipeRef = ref(db, 'Review/')
+    const recipeRef = ref(getDatabase(), 'Review/')
     onValue(recipeRef, (snapshot) => {
       const data = snapshot.val()
       console.log(data)
       if (data) {
         const dataArray = Object.values(data)
-        const filteredData = dataArray.filter(
-          (item) => item.recipeid === resepid
+        console.log(dataArray)
+        const filteredData = dataArray.filter((item) =>
+          item.recipeid.toString().includes(resepid)
         )
-        setData(filteredData)
         console.log(filteredData)
+        setData(filteredData)
       }
     })
-  }, [])
+  }, [resepid])
 
   const handleReview = () => {
-    navigation.navigate('AddReview', { selectedRecipe })
+    navigation.navigate('AddReview', { resepid })
+  }
+
+  const renderRatingIcons = (rating) => {
+    const icons = []
+    for (let i = 1; i <= 5; i++) {
+      icons.push(
+        <Icon
+          key={i}
+          name={i <= rating ? 'star' : 'star-o'}
+          size={20}
+          color={i <= rating ? '#FBD532' : '#DDD'}
+        />
+      )
+    }
+    return icons
   }
 
   return (
     <ScrollView>
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 1,
+          borderRadius: 50,
+        }}
+        onPress={() => handleback()}
+      >
+        <Icon name="arrow-left" size={20} color="black" />
+      </TouchableOpacity>
       <View style={styles.container}>
         <View style={styles.header}>
           <Image style={styles.avatar} source={{ uri: 'user_avatar_url' }} />
@@ -98,10 +136,23 @@ const RecipeReview = ({ route }) => {
               data={Object.values(data)}
               keyExtractor={(item) => item.recipeid}
               renderItem={({ item }) => (
-                <View>
-                  <Text>Description: {item.description}</Text>
-                  <Text>Rating: {item.rating}</Text>
-                  {/* Add more fields as needed */}
+                <View style={styles.container}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: 15,
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row' }}>
+                      <Image style={styles.avatar} source={item.imageLink} />
+                      <Text style={styles.username}>{item.description}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row' }}>
+                      {renderRatingIcons(item.rating)}
+                    </View>
+                  </View>
                 </View>
               )}
             />
@@ -170,4 +221,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default RecipeReview
+export default Review
