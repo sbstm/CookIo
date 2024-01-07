@@ -283,6 +283,20 @@ const styles = StyleSheet.create({
     height: 33,
     justifyContent: 'center',
   },
+  inputLangkah: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 8,
+    marginBottom: 15,
+    height: 100,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
 })
 
 export default EditProfile

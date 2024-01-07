@@ -57,8 +57,8 @@ const AddReview = ({ route }) => {
       console.error('Error adding review:', error)
     }
   }
-   const renderRatingIcons = (rating) => {
-    const icons = [];
+  const renderRatingIcons = (rating) => {
+    const icons = []
     for (let i = 1; i <= 5; i++) {
       icons.push(
         <Icon
@@ -67,10 +67,10 @@ const AddReview = ({ route }) => {
           size={20}
           color={i <= rating ? '#FBD532' : '#DDD'}
         />
-      );
+      )
     }
-    return icons;
-  };
+    return icons
+  }
 
   const handleImagePicker = async () => {
     try {
@@ -110,6 +110,10 @@ const AddReview = ({ route }) => {
     }
     return stars
   }
+  const handleback = () => {
+    navigation.goBack()
+    return true
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -122,7 +126,9 @@ const AddReview = ({ route }) => {
           borderRadius: 50,
         }}
         onPress={() => handleback()}
-      ></TouchableOpacity>
+      >
+        <Icon name="arrow-left" size={20} color="black" />
+      </TouchableOpacity>
       <Text style={styles.heading}>Bagaimana Hasil Masakanmu?</Text>
 
       <View style={{ flexDirection: 'row', marginBottom: 10 }}>

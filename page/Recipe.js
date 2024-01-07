@@ -37,6 +37,12 @@ function Recipe({ route }) {
   const handleReview = () => {
     navigation.navigate('Review', { selectedRecipe })
   }
+  const handleKonversi = () => {
+    navigation.navigate('Konversi')
+  }
+  const handleTimer = () => {
+    navigation.navigate('Timer')
+  }
   return (
     <ScrollView style={styles.container}>
       <TouchableOpacity
@@ -74,6 +80,18 @@ function Recipe({ route }) {
                   onPress={() => handleReview()}
                   style={styles.masak}
                 ></ImageBackground>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => handleTimer()}
+              >
+                <Icon name="clock-o" size={30} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => handleKonversi()}
+              >
+                <Icon name="balance-scale" size={30} color="black" />
               </TouchableOpacity>
             </View>
           </View>

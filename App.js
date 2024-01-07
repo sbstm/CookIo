@@ -8,11 +8,13 @@ import SignupScreen from './page/Signup'
 import AddRecipeScreen from './page/AddRecipe'
 import LoginScreen from './page/Login'
 import RecipeScreen from './page/Recipe'
+import Konversi from './page/Konversi'
 import ProfileScreen from './page/profile'
 import EditProfile from './page/EditProfile'
 import AddReview from './page/AddReview'
 import ReviewScreen from './page/RecipeReview'
 import { auth } from './firebase'
+import Timer from './page/Timer'
 
 const Tab = createMaterialBottomTabNavigator()
 const Stack = createStackNavigator()
@@ -112,12 +114,16 @@ export default function App() {
             <Stack.Screen name="EditProfile" component={EditProfile} />
             <Stack.Screen name="AddReview" component={AddReview} />
             <Stack.Screen name="Review" component={ReviewScreen} />
+            <Stack.Screen name="Timer" component={Timer} />
+            <Stack.Screen name="Konversi" component={Konversi} />
           </>
         ) : (
           <>
             <Stack.Screen name="Main1" component={NotLoginTabs} />
             <Stack.Screen name="Signup" component={SignupScreen} />
             <Stack.Screen name="Recipe" component={RecipeScreen} />
+            <Stack.Screen name="Timer" component={Timer} />
+            <Stack.Screen name="Konversi" component={Konversi} />
           </>
         )}
       </Stack.Navigator>
