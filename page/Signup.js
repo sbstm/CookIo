@@ -16,6 +16,7 @@ import {
 import { useNavigation } from '@react-navigation/native'
 import { db } from '../firebase'
 import { storage } from '../firebase'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 function Singup() {
   const [username, setUsername] = useState('')
@@ -76,7 +77,7 @@ function Singup() {
   }
   return (
     <View style={styles.container}>
-    <TouchableOpacity
+      <TouchableOpacity
         style={{
           position: 'absolute',
           top: 20,

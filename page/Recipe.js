@@ -53,10 +53,7 @@ function Recipe({ route }) {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <ImageBackground
-          source={require('../assets/images/ayam.png')}
-          style={styles.bgtop}
-        >
+        <ImageBackground source={image} style={styles.bgtop}>
           <View style={styles.head}>
             <Text style={styles.masakan}>
               {judul.length > 20 ? judul.substring(0, 20) + '...' : judul}
@@ -81,7 +78,9 @@ function Recipe({ route }) {
             </View>
           </View>
           <Text style={styles.ingredientText}>
-            {descripsi} x {time} menit x {porsi} orang
+            {descripsi}
+            <br />
+            {time} menit x {porsi} orang
           </Text>
         </ImageBackground>
       </View>
